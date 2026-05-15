@@ -2,48 +2,66 @@ import cv2
 import numpy as np
 from sklearn.cluster import KMeans
 from skimage import color
+from fastapi import FastAPI, Request, UploadFile, File
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+import uvicorn
+import shutil
+import os
 
+app = FastAPI()
+
+# Setup folders for the web UI
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Logic from Day 2
 def get_dominant_colors(image_path, k=3):
-    """
-    Extracts the top 'k' dominant colors from an image using K-Means clustering.
-    """
-    # 1. Load the image
     img = cv2.imread(image_path)
-    if img is None:
-        return "Error: Image not found"
-    
-    # 2. Convert from BGR (OpenCV default) to RGB
+    if img is None: return None
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
-    # 3. Resize to speed up processing (200x200 is plenty for color analysis)
     img = cv2.resize(img, (200, 200))
-    
-    # 4. Reshape the image to be a list of pixels (flattening from 2D to 1D)
     pixels = img.reshape((-1, 3))
-    
-    # 5. Use K-Means to find the clusters
     model = KMeans(n_clusters=k, n_init=10)
     model.fit(pixels)
-    
-    # 6. Get the RGB values of the cluster centers
-    colors = model.cluster_centers_.astype(int)
-    
-    return colors
+    return model.cluster_centers_.astype(int)
 
 def calculate_similarity(color1_rgb, color2_rgb):
-    """
-    Calculates the perceptual distance (Delta E) between two RGB colors.
-    """
-    # Convert RGB to LAB (values must be normalized between 0 and 1)
     c1_lab = color.rgb2lab(np.uint8([[color1_rgb]]) / 255.0)
     c2_lab = color.rgb2lab(np.uint8([[color2_rgb]]) / 255.0)
+    return np.linalg.norm(c1_lab - c2_lab)
 
-    # Calculate Euclidean distance in the LAB color space
-    delta_e = np.linalg.norm(c1_lab - c2_lab)
+# --- Web Routes ---
+
+@app.get("/")
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.post("/analyze")
+async def analyze(request: Request, file1: UploadFile = File(...), file2: UploadFile = File(...)):
+    # Save uploaded files temporarily
+    os.makedirs("temp", exist_ok=True)
+    path1 = f"temp/{file1.filename}"
+    path2 = f"temp/{file2.filename}"
     
-    return delta_e
+    with open(path1, "wb") as buffer:
+        shutil.copyfileobj(file1.file, buffer)
+    with open(path2, "wb") as buffer:
+        shutil.copyfileobj(file2.file, buffer)
 
-# Initializer block
+    # Run Analysis
+    colors1 = get_dominant_colors(path1)
+    colors2 = get_dominant_colors(path2)
+    
+    # Compare primary colors (index 0)
+    distance = calculate_similarity(colors1[0], colors2[0])
+    result = "CLASH" if distance < 20 else "PASS"
+
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "result": result,
+        "distance": round(distance, 2)
+    })
+
 if __name__ == "__main__":
-    print("KitClash Logic Loaded.")
-    print("Ready to process colors and calculate distances.")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
