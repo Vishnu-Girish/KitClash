@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KitClash</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>KitClash Analyzer</h1>
+    <form action="/analyze" method="post" enctype="multipart/form-data">
+        <div>
+            <label>Upload Kit 1:</label>
+            <input type="file" name="file1" required>
+        </div>
+        <div>
+            <label>Upload Kit 2:</label>
+            <input type="file" name="file2" required>
+        </div>
+        <button type="submit">Check Similarity</button>
+    </form>
+
+    {% if result %}
+        <hr>
+        <h2>Status: {{ result }}</h2>
+        <p>Perceptual Distance: {{ distance }}</p>
+    {% endif %}
+</body>
+</html>
