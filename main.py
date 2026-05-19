@@ -11,11 +11,10 @@ import os
 
 app = FastAPI()
 
-# Setup folders for the web UI
+# Setup web framework directories
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Logic from Day 2
 def get_dominant_colors(image_path, k=3):
     img = cv2.imread(image_path)
     if img is None: return None
@@ -31,7 +30,7 @@ def calculate_similarity(color1_rgb, color2_rgb):
     c2_lab = color.rgb2lab(np.uint8([[color2_rgb]]) / 255.0)
     return np.linalg.norm(c1_lab - c2_lab)
 
-# --- Web Routes ---
+# --- Web App Routes ---
 
 @app.get("/")
 async def home(request: Request):
@@ -49,11 +48,11 @@ async def analyze(request: Request, file1: UploadFile = File(...), file2: Upload
     with open(path2, "wb") as buffer:
         shutil.copyfileobj(file2.file, buffer)
 
-    # Run Analysis
+    # Execute math models
     colors1 = get_dominant_colors(path1)
     colors2 = get_dominant_colors(path2)
     
-    # Compare primary colors (index 0)
+    # Compare primary colors
     distance = calculate_similarity(colors1[0], colors2[0])
     result = "CLASH" if distance < 20 else "PASS"
 
