@@ -1,27 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>KitClash</title>
+    <meta charset="UTF-8">
+    <title>KitClash | Jersey Color Analyzer</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>KitClash Analyzer</h1>
-    <form action="/analyze" method="post" enctype="multipart/form-data">
-        <div>
-            <label>Upload Kit 1:</label>
-            <input type="file" name="file1" required>
-        </div>
-        <div>
-            <label>Upload Kit 2:</label>
-            <input type="file" name="file2" required>
-        </div>
-        <button type="submit">Check Similarity</button>
-    </form>
+    <div class="container">
+        <h1>KitClash</h1>
+        <p class="subtitle">Real-time kit conflict detector for officials & kit managers</p>
 
-    {% if result %}
-        <hr>
-        <h2>Status: {{ result }}</h2>
-        <p>Perceptual Distance: {{ distance }}</p>
-    {% endif %}
+        <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="input-group">
+                <label>Home Kit Image</label>
+                <input type="file" name="file1" accept="image/*" required>
+            </div>
+            <div class="input-group">
+                <label>Away Kit Image</label>
+                <input type="file" name="file2" accept="image/*" required>
+            </div>
+            <button type="submit" class="submit-btn">Run Comparison</button>
+        </form>
+
+        {% if result %}
+        <div class="results-card {{ result.lower() }}">
+            <h2>Outcome: {{ result }}</h2>
+            <p>Perceptual LAB Distance ($\Delta E$): <strong>{{ distance }}</strong></p>
+
+            <div class="palette-container">
+                <div class="palette">
+                    <h3>Kit 1 Dominant Colors</h3>
+                    <div class="swatches">
+                        {% for hex in colors1 %}
+                        <div class="swatch" style="background-color: {{ hex }};" title="{{ hex }}"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="palette">
+                    <h3>Kit 2 Dominant Colors</h3>
+                    <div class="swatches">
+                        {% for hex in colors2 %}
+                        <div class="swatch" style="background-color: {{ hex }};" title="{{ hex }}"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
