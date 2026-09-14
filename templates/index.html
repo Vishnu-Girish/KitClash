@@ -25,7 +25,8 @@
         {% if result %}
         <div class="results-card {{ result.lower() }}">
             <h2>Outcome: {{ result }}</h2>
-            <p>Perceptual LAB Distance ($\Delta E$): <strong>{{ distance }}</strong></p>
+            <p>Minimum Perceptual Distance (&Delta;E): <strong>{{ distance }}</strong></p>
+            <p>Pattern Conflict Score: <strong>{{ clash_score }}</strong></p>
 
             <div class="palette-container">
                 <div class="palette">
