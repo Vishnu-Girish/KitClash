@@ -2,115 +2,239 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Press Start 2P', monospace;
 }
 
 body {
-    background-color: #0f172a;
+    background-color: #141824;
+    background-image: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 4px, 6px 100%;
     color: #f8fafc;
     display: flex;
     justify-content: center;
-    padding: 40px 20px;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-.container {
-    max-width: 600px;
+.arcade-cabinet {
+    max-width: 720px;
     width: 100%;
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    background: #1e2436;
+    border: 4px solid #ffffff;
+    box-shadow: 
+        0 0 0 4px #000000,
+        8px 8px 0 4px #0b0e17;
+    padding: 28px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 28px;
+    border-bottom: 4px dashed #3b4666;
+    padding-bottom: 18px;
 }
 
 h1 {
-    font-size: 2rem;
-    color: #38bdf8;
-    margin-bottom: 8px;
+    font-size: 1.8rem;
+    color: #facc15;
+    text-shadow: 4px 4px 0px #b45309;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
 }
 
 .subtitle {
+    font-size: 0.65rem;
     color: #94a3b8;
-    font-size: 0.95rem;
-    margin-bottom: 24px;
+    letter-spacing: 1px;
 }
 
-.input-group {
-    margin-bottom: 16px;
-}
-
-label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.9rem;
-    color: #cbd5e1;
-}
-
-input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px dashed #475569;
-    border-radius: 6px;
-    background: #0f172a;
-    color: #94a3b8;
-}
-
-.submit-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    background-color: #0284c7;
-    color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.submit-btn:hover {
-    background-color: #0369a1;
-}
-
-.results-card {
-    margin-top: 25px;
+/* Arena & Jersey Outlines */
+.arena {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #131722;
+    border: 4px solid #3b4666;
     padding: 20px;
-    border-radius: 8px;
+    margin-bottom: 24px;
+    gap: 12px;
+}
+
+.kit-slot {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
 }
 
-.results-card.clash {
-    background-color: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
+.slot-label {
+    font-size: 0.65rem;
+    color: #38bdf8;
+    margin-bottom: 12px;
 }
 
-.results-card.pass {
-    background-color: rgba(34, 197, 94, 0.15);
-    border: 1px solid #22c55e;
+.pixel-jersey {
+    width: 140px;
+    height: 140px;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.8));
+    margin-bottom: 14px;
+    transition: transform 0.15s steps(2);
 }
 
-.palette-container {
+.pixel-jersey:hover {
+    transform: translateY(-4px);
+}
+
+.vs-badge {
+    font-size: 1.1rem;
+    color: #ef4444;
+    text-shadow: 3px 3px 0px #000000;
+    padding: 8px;
+}
+
+.empty-hint {
+    font-size: 0.55rem;
+    color: #475569;
+    margin-top: 6px;
+}
+
+.hex-readout {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+}
+
+.pixel-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.55rem;
+    background: #1e2436;
+    border: 2px solid #475569;
+    padding: 4px 8px;
+    color: #e2e8f0;
+}
+
+.chip-box {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #000000;
+    display: inline-block;
+}
+
+/* Form & Pixel Buttons */
+.file-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.pixel-file-btn {
+    flex: 1;
+    background: #283149;
+    border: 4px solid #64748b;
+    box-shadow: 4px 4px 0px #000000;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.05s;
+}
+
+.pixel-file-btn:hover {
+    border-color: #38bdf8;
+    background: #313c59;
+}
+
+.pixel-file-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0px #000000;
+}
+
+.pixel-file-btn span {
+    font-size: 0.65rem;
+    color: #ffffff;
+}
+
+.pixel-file-btn small {
+    font-size: 0.5rem;
+    color: #94a3b8;
+}
+
+.pixel-file-btn input[type="file"] {
+    display: none;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 16px;
+    background: #22c55e;
+    color: #052e16;
+    font-size: 0.8rem;
+    border: 4px solid #ffffff;
+    box-shadow: 4px 4px 0px #000000;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.start-btn:hover {
+    background: #4ade80;
+}
+
+.start-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000000;
+}
+
+/* Result Box */
+.result-box {
+    margin-top: 24px;
+    padding: 18px;
+    border: 4px solid #ffffff;
+    box-shadow: 4px 4px 0px #000000;
+    text-align: center;
+}
+
+.result-box.clash {
+    background: #7f1d1d;
+    border-color: #fca5a5;
+}
+
+.result-box.pass {
+    background: #14532d;
+    border-color: #86efac;
+}
+
+.status-banner h2 {
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+    line-height: 1.4;
+    text-shadow: 2px 2px 0px #000000;
+}
+
+.stats-grid {
     display: flex;
     justify-content: space-around;
-    margin-top: 20px;
-    gap: 15px;
+    font-size: 0.6rem;
+    color: #e2e8f0;
+    padding-top: 10px;
+    border-top: 2px dashed rgba(255, 255, 255, 0.3);
 }
 
-.palette h3 {
-    font-size: 0.85rem;
-    color: #cbd5e1;
-    margin-bottom: 8px;
+.stats-grid span {
+    color: #facc15;
 }
 
-.swatches {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.swatch {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+@media (max-width: 600px) {
+    .arena, .file-row {
+        flex-direction: column;
+    }
 }

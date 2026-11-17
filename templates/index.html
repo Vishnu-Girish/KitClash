@@ -2,53 +2,134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>KitClash | Jersey Color Analyzer</title>
+    <title>KITCLASH // 8-BIT ANALYZER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>KitClash</h1>
-        <p class="subtitle">Real-time kit conflict detector for officials & kit managers</p>
+    <div class="arcade-cabinet">
+        <header class="header">
+            <h1>KITCLASH</h1>
+            <p class="subtitle">16-BIT MATCHDAY KIT ANALYZER</p>
+        </header>
 
-        <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
-            <div class="input-group">
-                <label>Home Kit Image</label>
-                <input type="file" name="file1" accept="image/*" required>
+        <!-- Pixel Jersey Arena -->
+        <div class="arena">
+            <!-- HOME KIT -->
+            <div class="kit-slot">
+                <span class="slot-label">P1 // HOME</span>
+                {% set c1_main = colors1[0] if colors1 else '#2d3748' %}
+                {% set c1_sec  = colors1[1] if colors1 else '#4a5568' %}
+                {% set c1_trim = colors1[2] if colors1 else '#718096' %}
+                
+                <svg class="pixel-jersey" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <!-- Outline -->
+                    <path fill="#000000" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
+                    <!-- Primary Body (Color 1) -->
+                    <path fill="{{ c1_main }}" d="M5,2 h1 v1 h4 v-1 h1 v12 h-6 z"/>
+                    <!-- Sleeves & Side Stripes (Color 2) -->
+                    <path fill="{{ c1_sec }}" d="M2,4 h3 v3 h-3 z M11,4 h3 v3 h-3 z M6,5 h1 v9 h-1 z M9,5 h1 v9 h-1 z"/>
+                    <!-- Collar & Cuffs Trim (Color 3) -->
+                    <path fill="{{ c1_trim }}" d="M6,2 h4 v1 h-4 z M2,7 h3 v1 h-3 z M11,7 h3 v1 h-3 z M5,13 h6 v1 h-6 z"/>
+                </svg>
+
+                {% if colors1 %}
+                <div class="hex-readout">
+                    {% for hex in colors1 %}
+                    <div class="pixel-chip">
+                        <span class="chip-box" style="background-color: {{ hex }};"></span>
+                        <span>{{ hex }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-hint">NO DATA</p>
+                {% endif %}
             </div>
-            <div class="input-group">
-                <label>Away Kit Image</label>
-                <input type="file" name="file2" accept="image/*" required>
+
+            <div class="vs-badge">VS</div>
+
+            <!-- AWAY KIT -->
+            <div class="kit-slot">
+                <span class="slot-label">P2 // AWAY</span>
+                {% set c2_main = colors2[0] if colors2 else '#2d3748' %}
+                {% set c2_sec  = colors2[1] if colors2 else '#4a5568' %}
+                {% set c2_trim = colors2[2] if colors2 else '#718096' %}
+
+                <svg class="pixel-jersey" viewBox="0 0 16 16" shape-rendering="crispEdges">
+                    <!-- Outline -->
+                    <path fill="#000000" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
+                    <!-- Primary Body (Color 1) -->
+                    <path fill="{{ c2_main }}" d="M5,2 h1 v1 h4 v-1 h1 v12 h-6 z"/>
+                    <!-- Sleeves & Side Stripes (Color 2) -->
+                    <path fill="{{ c2_sec }}" d="M2,4 h3 v3 h-3 z M11,4 h3 v3 h-3 z M6,5 h1 v9 h-1 z M9,5 h1 v9 h-1 z"/>
+                    <!-- Collar & Cuffs Trim (Color 3) -->
+                    <path fill="{{ c2_trim }}" d="M6,2 h4 v1 h-4 z M2,7 h3 v1 h-3 z M11,7 h3 v1 h-3 z M5,13 h6 v1 h-6 z"/>
+                </svg>
+
+                {% if colors2 %}
+                <div class="hex-readout">
+                    {% for hex in colors2 %}
+                    <div class="pixel-chip">
+                        <span class="chip-box" style="background-color: {{ hex }};"></span>
+                        <span>{{ hex }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="empty-hint">NO DATA</p>
+                {% endif %}
             </div>
-            <button type="submit" class="submit-btn">Run Comparison</button>
+        </div>
+
+        <!-- Upload Controls -->
+        <form action="/analyze" method="post" enctype="multipart/form-data" class="pixel-form">
+            <div class="file-row">
+                <label class="pixel-file-btn">
+                    <span>+ LOAD P1 KIT</span>
+                    <input type="file" name="file1" accept="image/*" required onchange="updateFileName(this, 'p1-name')">
+                    <small id="p1-name">NO FILE</small>
+                </label>
+
+                <label class="pixel-file-btn">
+                    <span>+ LOAD P2 KIT</span>
+                    <input type="file" name="file2" accept="image/*" required onchange="updateFileName(this, 'p2-name')">
+                    <small id="p2-name">NO FILE</small>
+                </label>
+            </div>
+            <button type="submit" class="start-btn">START MATCH CHECK</button>
         </form>
 
+        <!-- Result Banner -->
         {% if result %}
-        <div class="results-card {{ result.lower() }}">
-            <h2>Outcome: {{ result }}</h2>
-            <p>Minimum Perceptual Distance (&Delta;E): <strong>{{ distance }}</strong></p>
-            <p>Pattern Conflict Score: <strong>{{ clash_score }}</strong></p>
-
-            <div class="palette-container">
-                <div class="palette">
-                    <h3>Kit 1 Dominant Colors</h3>
-                    <div class="swatches">
-                        {% for hex in colors1 %}
-                        <div class="swatch" style="background-color: {{ hex }};" title="{{ hex }}"></div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="palette">
-                    <h3>Kit 2 Dominant Colors</h3>
-                    <div class="swatches">
-                        {% for hex in colors2 %}
-                        <div class="swatch" style="background-color: {{ hex }};" title="{{ hex }}"></div>
-                        {% endfor %}
-                    </div>
-                </div>
+        <div class="result-box {{ result.lower() }}">
+            <div class="status-banner">
+                {% if result == 'CLASH' %}
+                <h2>! KIT CLASH DETECTED !</h2>
+                {% else %}
+                <h2>* KITS CLEAR TO PLAY *</h2>
+                {% endif %}
+            </div>
+            <div class="stats-grid">
+                <p>DELTA-E: <span>{{ distance }}</span></p>
+                <p>OVERLAP: <span>{{ clash_score }}</span></p>
             </div>
         </div>
         {% endif %}
     </div>
+
+    <script>
+        function updateFileName(input, targetId) {
+            const label = document.getElementById(targetId);
+            if (input.files && input.files.length > 0) {
+                let name = input.files[0].name.toUpperCase();
+                if (name.length > 14) name = name.substring(0, 12) + '..';
+                label.textContent = name;
+                label.style.color = '#4ade80';
+            }
+        }
+    </script>
 </body>
 </html>
