@@ -2,31 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>KITCLASH // 8-BIT ANALYZER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KitClash // Pixel Kit Analyzer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="arcade-cabinet">
+    <div class="app-shell">
         <header class="header">
             <h1>KITCLASH</h1>
-            <p class="subtitle">16-BIT MATCHDAY KIT ANALYZER</p>
+            <p class="subtitle">Matchday Kit Conflict &amp; Color Analyzer</p>
         </header>
 
-        <!-- Pixel Jersey Arena -->
+        <!-- Side-by-Side Pixel Jersey Arena -->
         <div class="arena">
             <!-- HOME KIT -->
-            <div class="kit-slot">
-                <span class="slot-label">P1 // HOME</span>
-                {% set c1_main = colors1[0] if colors1 else '#2d3748' %}
-                {% set c1_sec  = colors1[1] if colors1 else '#4a5568' %}
-                {% set c1_trim = colors1[2] if colors1 else '#718096' %}
-                
+            <div class="kit-card">
+                <span class="badge home">HOME KIT</span>
+                {% set c1_main = colors1[0] if colors1 else '#262f45' %}
+                {% set c1_sec  = colors1[1] if colors1 else '#374361' %}
+                {% set c1_trim = colors1[2] if colors1 else '#4c5b82' %}
+
                 <svg class="pixel-jersey" viewBox="0 0 16 16" shape-rendering="crispEdges">
                     <!-- Outline -->
-                    <path fill="#000000" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
+                    <path fill="#090c14" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
                     <!-- Primary Body (Color 1) -->
                     <path fill="{{ c1_main }}" d="M5,2 h1 v1 h4 v-1 h1 v12 h-6 z"/>
                     <!-- Sleeves & Side Stripes (Color 2) -->
@@ -36,31 +37,31 @@
                 </svg>
 
                 {% if colors1 %}
-                <div class="hex-readout">
+                <div class="swatch-row">
                     {% for hex in colors1 %}
-                    <div class="pixel-chip">
-                        <span class="chip-box" style="background-color: {{ hex }};"></span>
+                    <div class="swatch-pill" title="{{ hex }}">
+                        <span class="swatch-dot" style="background-color: {{ hex }};"></span>
                         <span>{{ hex }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="empty-hint">NO DATA</p>
+                <span class="placeholder-text">Awaiting upload</span>
                 {% endif %}
             </div>
 
-            <div class="vs-badge">VS</div>
+            <div class="vs-divider">VS</div>
 
             <!-- AWAY KIT -->
-            <div class="kit-slot">
-                <span class="slot-label">P2 // AWAY</span>
-                {% set c2_main = colors2[0] if colors2 else '#2d3748' %}
-                {% set c2_sec  = colors2[1] if colors2 else '#4a5568' %}
-                {% set c2_trim = colors2[2] if colors2 else '#718096' %}
+            <div class="kit-card">
+                <span class="badge away">AWAY KIT</span>
+                {% set c2_main = colors2[0] if colors2 else '#262f45' %}
+                {% set c2_sec  = colors2[1] if colors2 else '#374361' %}
+                {% set c2_trim = colors2[2] if colors2 else '#4c5b82' %}
 
                 <svg class="pixel-jersey" viewBox="0 0 16 16" shape-rendering="crispEdges">
                     <!-- Outline -->
-                    <path fill="#000000" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
+                    <path fill="#090c14" d="M4,1 h2 v1 h4 v-1 h2 l3,3 v4 h-3 v7 h-8 v-7 h-3 v-4 z"/>
                     <!-- Primary Body (Color 1) -->
                     <path fill="{{ c2_main }}" d="M5,2 h1 v1 h4 v-1 h1 v12 h-6 z"/>
                     <!-- Sleeves & Side Stripes (Color 2) -->
@@ -70,51 +71,66 @@
                 </svg>
 
                 {% if colors2 %}
-                <div class="hex-readout">
+                <div class="swatch-row">
                     {% for hex in colors2 %}
-                    <div class="pixel-chip">
-                        <span class="chip-box" style="background-color: {{ hex }};"></span>
+                    <div class="swatch-pill" title="{{ hex }}">
+                        <span class="swatch-dot" style="background-color: {{ hex }};"></span>
                         <span>{{ hex }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="empty-hint">NO DATA</p>
+                <span class="placeholder-text">Awaiting upload</span>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Upload Controls -->
-        <form action="/analyze" method="post" enctype="multipart/form-data" class="pixel-form">
-            <div class="file-row">
-                <label class="pixel-file-btn">
-                    <span>+ LOAD P1 KIT</span>
-                    <input type="file" name="file1" accept="image/*" required onchange="updateFileName(this, 'p1-name')">
-                    <small id="p1-name">NO FILE</small>
+        <!-- Clean File Upload & Action Controls -->
+        <form action="/analyze" method="post" enctype="multipart/form-data" class="controls-form">
+            <div class="upload-grid">
+                <label class="dropzone" for="file1">
+                    <div class="dropzone-icon">&#8679;</div>
+                    <div class="dropzone-text">
+                        <strong>Select Home Kit</strong>
+                        <span id="p1-name">PNG, JPG, or WEBP</span>
+                    </div>
+                    <input id="file1" type="file" name="file1" accept="image/*" required onchange="updateFileName(this, 'p1-name')">
                 </label>
 
-                <label class="pixel-file-btn">
-                    <span>+ LOAD P2 KIT</span>
-                    <input type="file" name="file2" accept="image/*" required onchange="updateFileName(this, 'p2-name')">
-                    <small id="p2-name">NO FILE</small>
+                <label class="dropzone" for="file2">
+                    <div class="dropzone-icon">&#8679;</div>
+                    <div class="dropzone-text">
+                        <strong>Select Away Kit</strong>
+                        <span id="p2-name">PNG, JPG, or WEBP</span>
+                    </div>
+                    <input id="file2" type="file" name="file2" accept="image/*" required onchange="updateFileName(this, 'p2-name')">
                 </label>
             </div>
-            <button type="submit" class="start-btn">START MATCH CHECK</button>
+
+            <button type="submit" class="analyze-btn">Analyze Kit Clash</button>
         </form>
 
         <!-- Result Banner -->
         {% if result %}
-        <div class="result-box {{ result.lower() }}">
-            <div class="status-banner">
+        <div class="result-panel {{ result.lower() }}">
+            <div class="result-header">
                 {% if result == 'CLASH' %}
-                <h2>! KIT CLASH DETECTED !</h2>
+                <h2>CLASH DETECTED</h2>
+                <p>High visual overlap — change of kit recommended.</p>
                 {% else %}
-                <h2>* KITS CLEAR TO PLAY *</h2>
+                <h2>NO CLASH — CLEAR TO PLAY</h2>
+                <p>Sufficient perceptual contrast between kits.</p>
                 {% endif %}
             </div>
-            <div class="stats-grid">
-                <p>DELTA-E: <span>{{ distance }}</span></p>
-                <p>OVERLAP: <span>{{ clash_score }}</span></p>
+            <div class="metrics-bar">
+                <div class="metric">
+                    <span class="metric-label">Perceptual Distance (&Delta;E)</span>
+                    <span class="metric-value">{{ distance }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Pattern Overlap Score</span>
+                    <span class="metric-value">{{ clash_score }}</span>
+                </div>
             </div>
         </div>
         {% endif %}
@@ -123,11 +139,13 @@
     <script>
         function updateFileName(input, targetId) {
             const label = document.getElementById(targetId);
+            const dropzone = input.closest('.dropzone');
             if (input.files && input.files.length > 0) {
-                let name = input.files[0].name.toUpperCase();
-                if (name.length > 14) name = name.substring(0, 12) + '..';
+                let name = input.files[0].name;
+                if (name.length > 22) name = name.substring(0, 19) + '...';
                 label.textContent = name;
-                label.style.color = '#4ade80';
+                label.classList.add('file-selected');
+                dropzone.classList.add('has-file');
             }
         }
     </script>
