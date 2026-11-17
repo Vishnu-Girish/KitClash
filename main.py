@@ -1,15 +1,12 @@
-import os
-import shutil
 from pathlib import Path
-
 import cv2
-import numpy as np
-import uvicorn
 from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import numpy as np
 from skimage import color
 from sklearn.cluster import KMeans
+import uvicorn
 
 app = FastAPI()
 
@@ -23,10 +20,14 @@ def rgb_to_hex(rgb):
     return "#{:02x}{:02x}{:02x}".format(int(rgb[0]), int(rgb[1]), int(rgb[2]))
 
 
-def get_dominant_colors(image_path, k=3):
-    img = cv2.imread(image_path)
+def get_dominant_colors_from_bytes(image_bytes: bytes, k: int = 3):
+    # Decode image directly from memory buffer (avoids Windows path/disk issues)
+    np_arr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
     if img is None:
         return None, None
+
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (200, 200))
 
@@ -76,10 +77,8 @@ def evaluate_kit_clash(colors1, props1, colors2, props2, clash_threshold=22.0):
 
             pair_weight = props1[i] * props2[j]
             if dist < clash_threshold:
-                # Accumulate penalty inversely scaled by perceptual distance
                 weighted_clash_score += pair_weight * (1.0 - (dist / clash_threshold))
 
-    # Trigger clash if direct primary conflict or heavy pattern overlap
     clash_detected = is_direct_primary_clash or (weighted_clash_score > 0.25)
     outcome = "CLASH" if clash_detected else "PASS"
 
@@ -101,30 +100,26 @@ async def analyze(
     file1: UploadFile = File(...),
     file2: UploadFile = File(...)
 ):
-    temp_dir = BASE_DIR / "temp"
-    os.makedirs(temp_dir, exist_ok=True)
+    bytes1 = await file1.read()
+    bytes2 = await file2.read()
 
-    path1 = str(temp_dir / file1.filename)
-    path2 = str(temp_dir / file2.filename)
+    colors1, props1 = get_dominant_colors_from_bytes(bytes1)
+    colors2, props2 = get_dominant_colors_from_bytes(bytes2)
 
-    with open(path1, "wb") as buffer:
-        shutil.copyfileobj(file1.file, buffer)
-    with open(path2, "wb") as buffer:
-        shutil.copyfileobj(file2.file, buffer)
-
-    colors1, props1 = get_dominant_colors(path1)
-    colors2, props2 = get_dominant_colors(path2)
+    # Guard against unsupported formats like .avif
+    if colors1 is None or colors2 is None:
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "error": "One of the uploaded files could not be decoded (e.g. AVIF format). Please upload a standard PNG, JPG, or WEBP image."
+            }
+        )
 
     result, min_dist, clash_score = evaluate_kit_clash(colors1, props1, colors2, props2)
 
     hex_colors1 = [rgb_to_hex(c) for c in colors1]
     hex_colors2 = [rgb_to_hex(c) for c in colors2]
-
-    # Clean up temporary files
-    if os.path.exists(path1):
-        os.remove(path1)
-    if os.path.exists(path2):
-        os.remove(path2)
 
     return templates.TemplateResponse(
         request=request,

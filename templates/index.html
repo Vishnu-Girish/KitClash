@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
     <div class="app-shell">
@@ -17,7 +17,7 @@
         </header>
 
         <!-- Side-by-Side Pixel Jersey Arena -->
-        <div class="arena">
+        <div class="arena" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;">
             <!-- HOME KIT -->
             <div class="kit-card">
                 <span class="badge home">HOME KIT</span>
@@ -87,7 +87,7 @@
 
         <!-- Clean File Upload & Action Controls -->
         <form action="/analyze" method="post" enctype="multipart/form-data" class="controls-form">
-            <div class="upload-grid">
+            <div class="upload-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                 <label class="dropzone" for="file1">
                     <div class="dropzone-icon">&#8679;</div>
                     <div class="dropzone-text">
@@ -109,6 +109,16 @@
 
             <button type="submit" class="analyze-btn">Analyze Kit Clash</button>
         </form>
+
+        <!-- Format Error Banner -->
+        {% if error %}
+        <div class="result-panel clash">
+            <div class="result-header">
+                <h2>INVALID IMAGE FORMAT</h2>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Result Banner -->
         {% if result %}
