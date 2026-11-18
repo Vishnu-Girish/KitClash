@@ -1,4 +1,4 @@
-# KitClash ⚽👕
+# KitClash 
 
 **KitClash** is a real-time computer vision web application designed for football officials, referees, and kit managers to detect visual color clashes between opposing team jerseys before kickoff.
 
